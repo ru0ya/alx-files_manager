@@ -1,29 +1,29 @@
 const { MongoClient } = require('mongodb');
 
+const HOST = process.env.DB_HOST || 'localhost';
+const PORT = process.env.DB_PORT || 27017;
+const DATABASE = process.env.DB_DATABASE || 'files_manager';
+const url = `mongodb://${HOST}:${PORT}`;
+
 class DBClient {
   constructor() {
-    const host = process.env.DB_HOST || 'localhost';
-    const port = process.env.DB_PORT || 27017;
-    const database = process.env.DB_DATABASE || 'files_manager';
-
-    const uri = `mongodb://${host}:${port}/${database}`;
-
-    this.client = new MongoClient(uri);
+    MongoClient.connect(url, (err, client) => {
+      if (!err) {
+        this.db = client.db(`${DATABASE}`);
+      } else {
+        this.db = false;
+      }
+    });
   }
 
-  async isAlive() {
-    try {
-      await this.client.connect();
-      return true;
-    } catch (err) {
-      console.error(err);
-      return false;
-    }
+  isAlive() {
+    if (this.db) return true;
+    return false;
   }
 
   async nbUsers() {
     try {
-      const db = this.client.db();
+      const db = this.db();
       const collection = db.collection('users');
       const count = await collection.countDocuments();
       return count;

@@ -11,7 +11,6 @@ class RedisClient {
   isAlive() {
     return new Promise((resolve) => {
       this.client.on('connect', () => {
-        console.log('Connection to Redis is successful');
         resolve(true);
       });
 
@@ -59,5 +58,6 @@ class RedisClient {
   }
 }
 
-const redisClient = new RedisClient(6379, 'localhost');
+const redisClient = new RedisClient();
+
 module.exports = redisClient;
